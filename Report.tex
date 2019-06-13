@@ -17,6 +17,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage{bbold}
+\usepackage{hyperref}
 
 
 \usepackage{enumitem}
@@ -125,7 +126,7 @@
 \clearpage
 
 \begin{abstract}
-Potts models are a well studied subject of statistical mechanics. This project delves into the estimation of the joint distribution of missing values in a Potts model using a Markov Chain Monte Carlo approach.
+Potts models are a well studied subject of statistical mechanics. This introduces a novel Markov Chain Monte Carlo approach for estimating the joint distribution of missing values in a Potts model. The Swendsen Wang algorithm is used to increase computational efficiency.
 \end{abstract}
 \clearpage
 \pagenumbering{arabic}
@@ -165,6 +166,9 @@ where $\beta = 1 / (k T)$ is the inverse temperature $T$ with Boltzmann constant
 C(\beta) = \sum_{x \in \mathfrak X} \exp \left(-\beta \sum_{i = 1}^N \sum_{j = 1}^N \sum_{(k,l) \in E_{ij}} \1 \{x_{ij} = x_{kl}\}\right), 
 \end{equation}
 $E_{ij}$ is the set of all indices sharing an edge with $X_{ij}$, i.e.\ the indices $\{(i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)\}$, and $\1\{\cdot\} \in\{0, 1\}$ the indicator function which is $1$ if $\cdot$ is true. Note that for notational simplicity the lattice is assumed to be a torus, i.e.\ the pixels $X_{1j}$ share an edge with $X_{Nj}$ and the pixels $X_{i1}$ share an edge with $X_{iN}$ for al $i, j$, and $\mathfrak X$ is the set of all possible colorings $\{1, 2, \ldots, L\}^{N \times N}$ of size $|\mathfrak X| = L^{N^2}$.
+
+The remainder of this section discusses two complementary approaches to the estimation of the inverse temperature $\beta$ in a 2D Potts model in Section~\ref{temperature_estimation}, a pseudlikelihood estimator in Section~\ref{MPLE_estimator} and an MCMC estimator in Section~\ref{MCMC_estimator}. Section~\ref{model_sampling} introduces a Gibbs Sampler (Section~\ref{gibbs_sampler}) and the Swendsen Wang algorithm (Section~\ref{swendsen_wang}) for sampling new observations from a Potts model.
+Section~\ref{treatment_of_missing_values} discusses how to use these algorithms to estimate the temperature (Section~\ref{missing_values_temperature}) and sample over missing observations from a partially observed grid (Section~\ref{missing_values_model_sampling}).
 
 \subsection{Temperature Estimation}\label{temperature_estimation}
 An important problem arising in Potts models is the estimation of the inverse temperature $\beta$. As there are no feasible analytical results, a maximum pseudolikelihood estimator (MPLE) (Section~\ref{MPLE_estimator}), see e.g.\ \cite{levada2009pseudo}, and a MCMC estimator (Section~\ref{MCMC_estimator}) are used. The MPLE estimator is computationally way more efficient (scaling with $N^2 \cdot L$) than the MCMC algorithm (scaling with $M \cdot N^2 \cdot L$, where $M$ is the number of MCMC samples drawn) but can be biased, particularly for large $\beta$. The MCMC algorithm has the disadvantage that it requires a prespecified starting value $\beta_0^\text{MCMC},$ which needs to be close to the true $\beta$ for the estimator to converge within a practical number of MCMC iterations $M$. The strengths of these two approaches can be combined, by using the MPLE estimator to obtain an initial starting value for the MCMC algorithm,
@@ -288,8 +292,6 @@ SW for a given lattice $X$ and inverse temperature $\beta$ is structured the sam
 This can increase computational efficiency, especially for large $\beta$, as a Potts model in equilibrium with a high $\beta$ has a very small flipping probability for any individual pixel. SW avoids this problem by creating increasingly large clusters for increasing $\beta$. This means, that for large $\beta$ the flipping probability is still one, but the probability of neighboring pixels with the same color being assigned different colors in an update step converges to 0 for large $\beta$.
 Figure~\ref{fig:potts_models} shows one update step from topright to bottomleft, where most of the yellow cluster in the center is flipped to green. From topleft to topright shows how a large number of SW updates move a randomly initialized grid into its equilibrium given inverse temperature $\beta$.
 %
-
-%
 \begin{figure}
 	\centering
 	\includegraphics[width=0.45\textwidth]{plots/grid_initial.png}
@@ -300,9 +302,10 @@ Figure~\ref{fig:potts_models} shows one update step from topright to bottomleft,
 	\label{fig:potts_models}
 \end{figure}
 %
+A GIF of SW sampling new observations in a Potts model in equilibrium can be found following this \href{https://github.com/maierhofert/2DPottsModel/blob/master/plots/grid_SW_equilibrium.gif}{\underline{link}}.
 
 
-\subsection{Treatment of Missing Values}
+\subsection{Treatment of Missing Values}\label{treatment_of_missing_values}
 The main goal of the project is to implement an algorithm to estimate a distribution over missing values by means of multiple imputation. The algorithms above for estimating the inverse temperature $\beta$ (Section~\ref{temperature_estimation}) 
 and model sampling (Section~\ref{model_sampling}) assume a completely observed lattice $X$. The problem of estimating $\beta$ and calculating the model when missing values are present can be circumvented using a Gibbs sampler.
 The Gibbs sampler for obtaining $M$ samples of the complete lattice works as follows: \\
@@ -326,21 +329,42 @@ The Gibbs sampler for obtaining $M$ samples of the complete lattice works as fol
 \end{enumerate}
 }}}
 
-\subsubsection{Missing Values in Temperature  Estimation}
-The presence of missing values does not affect the estimation of the inverse temperature $\beta$ in Steps~\ref{step:estimate_beta} and~\ref{step:estimate_beta2}. The grid can be assumed to be fully observed and the Gibbs sampler ensures asymptotically unbiased estimates of $\beta$.
 
-\subsubsection{Missing Values in Model Sampling}
+
+\subsubsection{Missing Values in Temperature  Estimation}\label{missing_values_temperature}
+The presence of missing values does not affect the estimation of the inverse temperature $\beta$ in Steps~\ref{step:estimate_beta} and~\ref{step:estimate_beta2}. The grid can be assumed to be fully observed and the Gibbs sampler ensures asymptotically unbiased estimates of $\beta$.
+Initializing missing values randomly will result in a dramatical underestimation of the inverse temperature $\beta$. 
+A long burnin could be necessary to move the grid into an equilibrium state with stable estimated $\beta$ when $\beta$ is large and/or a large number of values in the grid are missing, see Figure~\ref{fig:beta_missing}.
+%
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\textwidth]{plots/beta_b1_it500_missing.png}
+	\caption{Burnin of the grid shown in the bottomleft of Figure~\ref{fig:potts_models} when missing values are initialized randomly. The plot shows the number of update steps on the $x$ axis vs. estimated $\beta$ on the $y$ axis. The true $\beta = 1$ is shown in green.}
+	\label{fig:beta_missing}
+\end{figure}
+%
+
+
+\subsubsection{Missing Values in Model Sampling}\label{missing_values_model_sampling}
 Caution should be exercised in Step~\ref{step:SW_miss} as standard SW (Section~\ref{swendsen_wang}) will flip any $X_{ij} \in X$ regardless of whether are observed or missing. In this application, only missing pixels $X_{ij} \in X_\text{miss}$ should be flipped, as observed pixels $X_{kl} \in X_\text{obs}$ are, as the name suggests, observed and thus fixed. 
 Proposing edge sets $E^*$ that result in clusters containing only unobserved pixels is non-trivial.\footnote{It is actually trivial to propose edge sets and thus clusters that contain only unobserved pixels, but I was unable to think of a clustering strategy for which the acceptance probabilities are not computationally complex, differ by proposed class, and are definitely not equal to 1.} 
 An ad-hoc solution to this problem is keep proposing new edge sets and thus clusters until all observations in the cluster selected for flipping are unobserved. Then, the cluster can be flipped with probability 1.
 % TODO write what it changes in the OG SW algorithm 
 % This ad-hoc solutions 
+%
+A GIF of SW converging towards its equilibrium in the presence of missing values in a Potts model can be found following this \href{https://github.com/maierhofert/2DPottsModel/blob/master/plots/grid_missing_burnin.gif}{\underline{link}}.
+%
+A GIF of SW sampling observations for missing values in a Potts model in equilibrium can be found following this \href{https://github.com/maierhofert/2DPottsModel/blob/master/plots/grid_missing_equilibrium.gif}{\underline{link}}.
+Note how the observed values in the grid never change.
 
 \clearpage
 \section{Future Research}\label{future_research}
-There are a number of open research question that could not be addressed due to time constraints of this projects. The most important ones are:
+There are a number of open research question that could not be addressed due to time constraints of this projects. 
+The most important ones are:
 \begin{itemize}
-    \item How does the ratio of missing values affect the estimation of $\beta$? Undoubtedly, the variance will increase, but a bias towards smaller values of $\beta$ could be introduced, as fewer and fewer (in the extreme case no) neighboring pixels are observed.
+    \item How does the ratio of missing values affect the estimation of $\beta$? Undoubtedly, the variance will increase, but a bias towards smaller values of $\beta$ could be introduced, as fewer and fewer (in the extreme case no) neighboring pixels are observed. The estimator could also run into the risk of diverging for small proportions of observed values.
+    \item It would be interesting to analyze the run-time of SW and the Gibbs sampler for missing values for varying proportions of missing values and $\beta$.
+    \item Is there a way to create and flip clusters that only contain missing values?
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -354,7 +378,7 @@ There are a number of open research question that could not be addressed due to 
 \begin{appendix}
 \appendix
 \section*{Digital Appendix}
-The Python implemention of all methods presented in this report can be found in the publicly accessible Github repository \url{https://github.com/maierhofert/2DPottsModel.git}. 
+The Python implemention of all methods, figures, and GIFs presented in this report can be found in a publicly accessible  \href{https://github.com/maierhofert/2DPottsModel.git}{\underline{Github repository}}. The files \url{potts_SW_missing.py} and \url{animations.py} can be executed to recreate all figures and GIFs.
 It also contains all figures, GIFs, and the Latex code used to generate this report.
 \end{appendix}
 
