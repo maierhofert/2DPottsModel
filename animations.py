@@ -157,7 +157,7 @@ grid_est_beta = grid.copy()
 mat = ax.matshow(grid_est_beta)
 # plt.show(mat)
 ani = animation.FuncAnimation(fig, update, data_gen, interval=10, repeat = True, repeat_delay = 500,
-                              save_count=1000)
+                              save_count=500)
 # plt.show()
 
 ani.save('plots/grid_missing_burnin.gif', dpi=200, writer='imagemagick')
@@ -174,7 +174,7 @@ for i in range(1000):
 
 # plot grid working with missing values
 ani = animation.FuncAnimation(fig, update, data_gen, interval=10, repeat_delay = 500,
-                              save_count=1000)
+                              save_count=500)
 # plt.show()
 
 ani.save('plots/grid_missing_equilibrium.gif', dpi=200, writer='imagemagick')
@@ -207,7 +207,7 @@ for i in range(500):
 mat = ax.matshow(grid_beta)
 # plt.show(mat)
 ani = animation.FuncAnimation(fig, update, data_gen, interval=10, repeat = True, repeat_delay = 500,
-                              save_count=1000)
+                              save_count=500)
 # plt.show()
 
 ani.save('plots/grid_SW_equilibrium.gif', dpi=200, writer='imagemagick')

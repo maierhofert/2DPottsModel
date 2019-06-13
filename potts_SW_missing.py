@@ -175,7 +175,7 @@ plt.matshow(A=grid_true_beta, cmap = cMap, vmin=0, vmax=n_states)
 # then fills missing values using estimated beta
 grid_est_beta = grid.copy()
 # beta_path = [0.5]
-B = 5000
+B = 10000
 beta_path = np.zeros((B))
 # longer burn in needed
 for i in range(B):
