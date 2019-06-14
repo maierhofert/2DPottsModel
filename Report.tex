@@ -267,6 +267,9 @@ In pseudo code, the algorithm to obtain $M$ samples from the Potts model with in
     \end{enumerate}
 }}}
 
+%
+A GIF of the Gibbs sampler sampling new observations from a Potts model in equilibrium can be found following this \href{https://github.com/maierhofert/2DPottsModel/blob/master/plots/grid_Gibbs_equilibrium.gif}{\underline{link}}.
+
 \subsubsection{Swendsen Wang Algorithm}\label{swendsen_wang}
 The Swendsen Wang Algorithm (SW) is a generalization of the model sampling presented above (Section~\ref{gibbs_sampler}). Instead of proposing individual pixels $X_{ij}$ to be flipped with probability less than one, SW creates probabilistic clusters from which one will be selected to be flipped in its entirety. 
 SW for a given lattice $X$ and inverse temperature $\beta$ is structured the same way as the Potts model sampling in Section~\ref{gibbs_sampler}, but instead of updating individual pixels in Steps~2.1.-2.4. and 3.1.-3.4., entire clusters of pixels are updated using the following algorithm:  \\
