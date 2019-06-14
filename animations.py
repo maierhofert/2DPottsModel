@@ -104,8 +104,11 @@ from potts_swendsen_wang import *
 # from potts_estimate_beta_missing_values import *
 from potts_estimate_beta import *
 
-colors = ['yellow','blue','green', 'red']
-miss_colors = ['grey', 'yellow','blue','green', 'red']
+# colors = ['yellow','blue','green', 'red']
+# miss_colors = ['grey', 'yellow','blue','green', 'red']
+colors = ['palegoldenrod','palegreen','lightcoral','lightblue']
+miss_colors = ['grey', 'palegoldenrod','palegreen','lightcoral','lightblue']
+
 cMap = pltcols.ListedColormap(colors, N = n_states)
 cMapmiss = pltcols.ListedColormap(miss_colors)
 

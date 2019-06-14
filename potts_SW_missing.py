@@ -10,8 +10,11 @@ from potts_swendsen_wang import *
 from potts_estimate_beta import *
 
 
-colors = ['yellow','blue','green', 'red']
-miss_colors = ['grey', 'yellow','blue','green', 'red']
+# colors = ['yellow','blue','green','red']
+# miss_colors = ['grey', 'yellow','blue','green', 'red']
+
+colors = ['palegoldenrod','palegreen','lightcoral','lightblue']
+miss_colors = ['grey', 'palegoldenrod','palegreen','lightcoral','lightblue']
 cMap = pltcols.ListedColormap(colors, N = n_states)
 cMapmiss = pltcols.ListedColormap(miss_colors)
 
@@ -171,27 +174,27 @@ for i in range(50):
 plt.matshow(A=grid_true_beta, cmap = cMap, vmin=0, vmax=n_states)
 # plt.show()
 
-# set up Gibbs Sampler that estimates beta from data
-# then fills missing values using estimated beta
-grid_est_beta = grid.copy()
-# beta_path = [0.5]
-B = 10000
-beta_path = np.zeros((B))
-# longer burn in needed
-for i in range(B):
-  # estimate beta using MPL
-  est_beta = estimate_beta_MPL(grid=grid_est_beta, betas=np.arange(0.1, 1.5, 0.01), n_states=n_states)
-  # beta_path.append(est_beta.copy())
-  beta_path[i] = est_beta.copy()
-  # estimate missing values given beta
-  grid_est_beta = runIter_SW_missing(grid_est_beta, miss, est_beta)
-
-# Visualize path of estimated beta
-plt.figure()
-plt.plot(beta_path)
-plt.axhline(beta, color="green")
-# plt.show()
-# save figure
-plt.savefig("plots/beta_b1_it500_missing.png", bbox_inches='tight')
+# # set up Gibbs Sampler that estimates beta from data
+# # then fills missing values using estimated beta
+# grid_est_beta = grid.copy()
+# # beta_path = [0.5]
+# B = 5000
+# beta_path = np.zeros((B))
+# # longer burn in needed
+# for i in range(B):
+#   # estimate beta using MPL
+#   est_beta = estimate_beta_MPL(grid=grid_est_beta, betas=np.arange(0.1, 1.5, 0.01), n_states=n_states)
+#   # beta_path.append(est_beta.copy())
+#   beta_path[i] = est_beta.copy()
+#   # estimate missing values given beta
+#   grid_est_beta = runIter_SW_missing(grid_est_beta, miss, est_beta)
+# 
+# # Visualize path of estimated beta
+# plt.figure()
+# plt.plot(beta_path)
+# plt.axhline(beta, color="green")
+# # plt.show()
+# # save figure
+# plt.savefig("plots/beta_b1_it500_missing.png", bbox_inches='tight')
 
 
