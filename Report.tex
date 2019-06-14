@@ -350,25 +350,22 @@ A long burnin could be necessary to move the grid into an equilibrium state with
 
 \subsubsection{Missing Values in Model Sampling}\label{missing_values_model_sampling}
 Caution should be exercised in Step~\ref{step:SW_miss} as standard SW (Section~\ref{swendsen_wang}) will flip any $X_{ij} \in X$ regardless of whether are observed or missing. In this application, only missing pixels $X_{ij} \in X_\text{miss}$ should be flipped, as observed pixels $X_{kl} \in X_\text{obs}$ are, as the name suggests, observed and thus fixed. 
-Proposing edge sets $E^*$ that result in clusters containing only unobserved pixels is non-trivial.\footnote{It is actually trivial to propose edge sets and thus clusters that contain only unobserved pixels, but I was unable to think of a clustering strategy for which the acceptance probabilities are not computationally complex, differ by proposed class, and are definitely not equal to 1.} 
-An ad-hoc solution to this problem is keep proposing new edge sets and thus clusters until all observations in the cluster selected for flipping are unobserved. Then, the cluster can be flipped with probability 1.
+Proposing edge sets $E^*$ that result in clusters containing only unobserved pixels is non-trivial.\footnote{It is actually trivial to propose edge sets and thus clusters that contain only unobserved pixels, but quite difficult to find a clustering strategy for which the acceptance probabilities are not computationally complex, differ by proposed class, and are definitely not equal to 1.} 
+An ad-hoc solution to this problem is to keep proposing new edge sets and thus clusters until all observations in the cluster selected for flipping are unobserved. Then, the cluster can be flipped with probability 1.
 % TODO write what it changes in the OG SW algorithm 
 % This ad-hoc solutions 
 %
-A GIF of SW converging towards its equilibrium in the presence of missing values in a Potts model can be found following this \href{https://github.com/maierhofert/2DPottsModel/blob/master/plots/grid_missing_burnin.gif}{\underline{link}}.
+A GIF of SW converging towards its equilibrium in the presence of missing values in a Potts model can be found following this \href{https://github.com/maierhofert/2DPottsModel/blob/master/plots/grid_missing_burnin.gif}{\underline{link}}. Note that the clusters grow in size over time and the number of pixels flipped per update step also increases.
 %
 A GIF of SW sampling observations for missing values in a Potts model in equilibrium can be found following this \href{https://github.com/maierhofert/2DPottsModel/blob/master/plots/grid_missing_equilibrium.gif}{\underline{link}}.
-Note how the observed values in the grid never change.
+Note that the observed values in the grid never change.
 
 \clearpage
 \section{Future Research}\label{future_research}
 There are a number of open research question that could not be addressed due to time constraints of this projects. 
-The most important ones are:
-\begin{itemize}
-    \item How does the ratio of missing values affect the estimation of $\beta$? Undoubtedly, the variance will increase, but a bias towards smaller values of $\beta$ could be introduced, as fewer and fewer (in the extreme case no) neighboring pixels are observed. The estimator could also run into the risk of diverging for small proportions of observed values.
-    \item It would be interesting to analyze the run-time of SW and the Gibbs sampler for missing values for varying proportions of missing values and $\beta$.
-    \item Is there a way to create and flip clusters that only contain missing values?
-\end{itemize}
+The first question is how the ratio of missing values affect the estimation of $\beta$. Undoubtedly, the variance will increase, but a bias towards smaller values of $\beta$ could be introduced, as fewer and fewer (in the extreme case no) neighboring pixels are observed. The estimator could also run into the risk of diverging for small proportions of observed values.
+
+Another interesting problem is the analysis of the run-time of SW and the Gibbs sampler for missing values for varying proportions of missing values and $\beta$. The Gibbs sampler would fail to work for large $\beta$ and the proposed SW algorithm would have a low probability of sampling clusters with only unobserved variables and thus a low probability of actually executing a flip.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \clearpage
@@ -382,7 +379,7 @@ The most important ones are:
 \appendix
 \section*{Digital Appendix}
 The Python implemention of all methods, figures, and GIFs presented in this report can be found in a publicly accessible  \href{https://github.com/maierhofert/2DPottsModel.git}{\underline{Github repository}}. The files \url{potts_SW_missing.py} and \url{animations.py} can be executed to recreate all figures and GIFs.
-It also contains all figures, GIFs, and the Latex code used to generate this report.
+The repository also contains all figures, GIFs, and the Latex code used to generate this report.
 \end{appendix}
 
 \end{document}
