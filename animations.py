@@ -157,14 +157,15 @@ fig, ax = plt.subplots()
 # then fills missing values using estimated beta
 grid_est_beta = grid.copy()
 
-mat = ax.matshow(grid_est_beta)
+mat = ax.matshow(grid_est_beta, cmap = cMap)
+
+print("start grid_missing_burnin")
 # plt.show(mat)
 ani = animation.FuncAnimation(fig, update, data_gen, interval=10, repeat = True, repeat_delay = 500,
                               save_count=500)
 # plt.show()
 
 ani.save('plots/grid_missing_burnin.gif', dpi=200, writer='imagemagick')
-
 
 
 ####################################################################
@@ -174,7 +175,7 @@ for i in range(1000):
   # estimate missing values given beta
   grid_est_beta = runIter_SW_missing(grid=grid_est_beta, miss=miss, beta=1)
 
-
+print("start grid_missing_equilibrium")
 # plot grid working with missing values
 ani = animation.FuncAnimation(fig, update, data_gen, interval=10, repeat_delay = 500,
                               save_count=500)
@@ -207,7 +208,8 @@ for i in range(500):
   grid_beta = runIter_SW(grid=grid_beta, beta=1)
 
 
-mat = ax.matshow(grid_beta)
+print("start grid_SW_equilibrium")
+mat = ax.matshow(grid_beta, cmap = cMap)
 # plt.show(mat)
 ani = animation.FuncAnimation(fig, update, data_gen, interval=10, repeat = True, repeat_delay = 500,
                               save_count=500)
@@ -249,16 +251,14 @@ def data_gen():
 
 fig, ax = plt.subplots()
     
-# set up Gibbs Sampler that estimates beta from data
-# then fills missing values using estimated beta
 grid_beta = grid.copy()
 
 for i in range(10000):
   # estimate missing values given beta
   grid_beta = runIter(grid=grid_beta, beta=1)
 
-
-mat = ax.matshow(grid_beta)
+print("start grid_Gibbs_equilibrium")
+mat = ax.matshow(grid_beta, cmap = cMap)
 # plt.show(mat)
 ani = animation.FuncAnimation(fig, update, data_gen, interval=5, repeat = True, repeat_delay = 500,
                               save_count=500)
